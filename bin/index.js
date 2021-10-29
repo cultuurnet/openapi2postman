@@ -8,13 +8,14 @@ const fs = require('fs');
 const openApiSchemaFile = './entry.json'; // Hardcoded for now
 const postmanCollectionFile = './entry-postman.json'; // Hardcoded for now
 
-const baseUrl = 'http://io-acc.uitdatabank.be'; // // Dependent on environment. Hardcoded for now.
-const tokenGrantType = 'authorization_code'; // Hardcoded for now. Sensible default would be `client_credentials`.
-const authorizeUrl = 'https://account-acc.uitid.be/authorize?audience=https://api.publiq.be&prompt=login'; // Dependent on environment. Hardcoded for now.
-const accessTokenUrl = 'https://account-acc.uitid.be/oauth/token'; // Dependent on environment. Hardcoded for now.
+const environment = 'acc'; // Hardcoded for now
+const environmentSuffix = (environment === 'prod') ? '' : '-' + environment;
+
+const baseUrl = 'http://io' + environmentSuffix + '.uitdatabank.be'; // Dependent on API. Hardcoded for now.
+const tokenGrantType = 'client_credentials'; // Hardcoded for now. Sensible default would be `client_credentials`.
 const clientId = 'mock'; // Hardcoded for now.
 const clientSecret = 'mock'; // Hardcoded for now.
-const callbackUrl = 'https://jwt-acc.uitdatabank.be/authorize'; // Hardcoded for now.
+const callbackUrl = 'https://jwt' + environmentSuffix + '.uitdatabank.be/authorize'; // Hardcoded for now.
 
 (
   async () => {
@@ -121,14 +122,14 @@ const callbackUrl = 'https://jwt-acc.uitdatabank.be/authorize'; // Hardcoded for
         },
         {
           key: 'oauth2AccessTokenUrl',
-          value: accessTokenUrl
+          value: 'https://account' + environmentSuffix + '.uitid.be/oauth/token'
         },
       ];
       if (tokenGrantType === 'authorization_code') {
         postmanCollection.variable = postmanCollection.variable.concat([
           {
             key: 'oauth2AuthUrl',
-            value: authorizeUrl
+            value: 'https://account' + environmentSuffix + '.uitid.be/authorize?audience=https://api.publiq.be&prompt=login'
           },
           {
             key: 'oauth2RedirectUri',
