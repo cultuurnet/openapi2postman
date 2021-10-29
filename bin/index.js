@@ -24,6 +24,7 @@ const openApiSchemaFile = './entry.json'; // Hardcoded for now
       if (!conversion.result) {
         throw conversion.reason;
       }
+      const postmanCollection = conversion.output[0].data;
       console.log('Converted OpenAPI schema to Postman v2.1 collection!');
     } catch(err) {
       console.error(err);
