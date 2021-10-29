@@ -2,7 +2,7 @@ const $RefParser = require("@apidevtools/json-schema-ref-parser");
 const Converter = require('openapi-to-postmanv2');
 const util = require('util');
 
-module.exports = async (openApiSchemaFile, environment, customBaseUrl, authOptions) => {
+module.exports = async (openApiSchemaFile, environment, customBaseUrl, authOptions, verbose) => {
   const { tokenGrantType, clientId, clientSecret, callbackUrl } = authOptions;
   const environmentSuffix = (environment === 'prod') ? '' : '-' + environment;
   const environmentNameMap = {
@@ -12,18 +12,24 @@ module.exports = async (openApiSchemaFile, environment, customBaseUrl, authOptio
   };
   const environmentName = environmentNameMap[environment];
 
+  const log = (message) => {
+    if (verbose) {
+      console.log(message);
+    }
+  }
+
   try {
     // Dereference the OpenAPI schema to resolve $refs to schemas in other files.
-    console.log('Dereferencing OpenAPI schema...');
+    log('Dereferencing OpenAPI schema...');
     const deReferencedOpenApiSchema = await $RefParser.dereference(openApiSchemaFile);
-    console.log('Dereferenced OpenAPI schema!');
+    log('Dereferenced OpenAPI schema!');
 
     // Make the Converter.convert() function (to convert the OpenAPI schema to a Postman collection) work with
     // promises.
     const convert = util.promisify(Converter.convert);
 
     // Convert the OpenAPI schema into a Postman collection.
-    console.log('Converting OpenAPI schema to Postman v2.1 collection...');
+    log('Converting OpenAPI schema to Postman v2.1 collection...');
     const conversionInput = {type: 'json', data: deReferencedOpenApiSchema};
     const conversionOptions = {
       folderStrategy: 'Tags',
@@ -34,10 +40,10 @@ module.exports = async (openApiSchemaFile, environment, customBaseUrl, authOptio
       throw conversion.reason;
     }
     const postmanCollection = conversion.output[0].data;
-    console.log('Converted OpenAPI schema to Postman v2.1 collection!');
+    log('Converted OpenAPI schema to Postman v2.1 collection!');
 
     // Configure authentication (only user access tokens for now).
-    console.log('Adding authentication configuration...');
+    log('Adding authentication configuration...');
 
     postmanCollection.auth = {
       type: "oauth2",
@@ -139,10 +145,10 @@ module.exports = async (openApiSchemaFile, environment, customBaseUrl, authOptio
     };
     postmanCollection.item.map(configureItemToInheritAuthFromParent);
 
-    console.log('Added authentication configuration!');
+    log('Added authentication configuration!');
 
     // Configure the base URL for the given environment.
-    console.log('Configuring base url...');
+    log('Configuring base url...');
     postmanCollection.variable = postmanCollection.variable.filter((variable) => variable.key !== 'baseUrl');
     let baseUrl = '';
     if (customBaseUrl.length > 0) {
@@ -159,7 +165,7 @@ module.exports = async (openApiSchemaFile, environment, customBaseUrl, authOptio
       value: baseUrl
     });
     if (baseUrl.length > 0) {
-      console.log('Configured base url!');
+      log('Configured base url!');
     } else {
       console.error('Could not configure base URL, no server found in OpenAPI schema for ' + environmentName + ' environment.');
       console.warn('Make sure to configure the correct base URL yourself after importing the Postman collection!');

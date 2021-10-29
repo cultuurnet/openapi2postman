@@ -17,7 +17,9 @@ const convertWithArgv = (argv) => {
     authOptions.callbackUrl = userAuthCallbackUrl;
   }
 
-  convert(openApiSchemaFile, environment, baseUrl, authOptions).then((postmanCollection) => {
+  const verbose = outputFileName.length > 0;
+
+  convert(openApiSchemaFile, environment, baseUrl, authOptions, verbose).then((postmanCollection) => {
     if (outputFileName.length > 0) {
       console.log('Writing Postman v2.1 collection to file...');
       fs.writeFileSync(outputFileName, JSON.stringify(postmanCollection, null, 2));
