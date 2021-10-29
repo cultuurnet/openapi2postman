@@ -5,7 +5,7 @@ const convert = require('../convert.js');
 const fs = require('fs');
 
 const convertWithArgv = (argv) => {
-  const {openApiSchemaFile, environment} = argv;
+  const {openApiSchemaFile, environment, baseUrl} = argv;
   const authOptions = {
     tokenGrantType: argv.tokenGrantType,
     clientId: argv.clientId,
@@ -17,7 +17,7 @@ const convertWithArgv = (argv) => {
     authOptions.callbackUrl = userAuthCallbackUrl;
   }
 
-  convert(openApiSchemaFile, environment, authOptions).then((postmanCollection) => {
+  convert(openApiSchemaFile, environment, baseUrl, authOptions).then((postmanCollection) => {
     console.log('Writing Postman v2.1 collection to file...');
     const postmanCollectionFile = './entry-postman.json';
     fs.writeFileSync(postmanCollectionFile, JSON.stringify(postmanCollection, null, 2));
@@ -29,7 +29,7 @@ yargs
   .scriptName("openapi2postman")
   .usage('$0 <cmd> [args]')
   .command(
-    'convert <openApiSchemaFile> <clientId> <clientSecret> [environment] [tokenGrantType] [userAuthCallbackUrl]',
+    'convert <openApiSchemaFile> <clientId> <clientSecret> [environment] [baseUrl] [tokenGrantType] [userAuthCallbackUrl]',
     'Convert an OpenAPI schema file to a Postman collection and configure it for integrators',
     (yargs) => {
       yargs.positional('openApiSchemaFile', {
@@ -49,6 +49,12 @@ yargs
         default: 'test',
         choices: ['acc', 'test', 'prod'],
         describe: 'the API\'s server environment to use as base URL for all requests',
+        type: 'string'
+      });
+      yargs.option('baseUrl', {
+        alias: 'b',
+        default: '',
+        describe: 'allows you to manually specify the baseUrl, for example for development environments',
         type: 'string'
       });
       yargs.option('tokenGrantType', {

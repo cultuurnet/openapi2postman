@@ -2,7 +2,7 @@ const $RefParser = require("@apidevtools/json-schema-ref-parser");
 const Converter = require('openapi-to-postmanv2');
 const util = require('util');
 
-module.exports = async (openApiSchemaFile, environment, authOptions) => {
+module.exports = async (openApiSchemaFile, environment, customBaseUrl, authOptions) => {
   const { tokenGrantType, clientId, clientSecret, callbackUrl } = authOptions;
   const environmentSuffix = (environment === 'prod') ? '' : '-' + environment;
   const environmentNameMap = {
@@ -144,13 +144,21 @@ module.exports = async (openApiSchemaFile, environment, authOptions) => {
     // Configure the base URL for the given environment.
     console.log('Configuring base url...');
     postmanCollection.variable = postmanCollection.variable.filter((variable) => variable.key !== 'baseUrl');
-    const servers = deReferencedOpenApiSchema.servers ?? [];
-    const environmentServer = servers.find((server) => server.description === environmentName);
-    if (environmentServer) {
-      postmanCollection.variable.push({
-        key: 'baseUrl',
-        value: environmentServer.url
-      });
+    let baseUrl = '';
+    if (customBaseUrl.length > 0) {
+      baseUrl = customBaseUrl;
+    } else {
+      const servers = deReferencedOpenApiSchema.servers ?? [];
+      const environmentServer = servers.find((server) => server.description === environmentName);
+      if (environmentServer) {
+        baseUrl = environmentServer.url;
+      }
+    }
+    postmanCollection.variable.push({
+      key: 'baseUrl',
+      value: baseUrl
+    });
+    if (baseUrl.length > 0) {
       console.log('Configured base url!');
     } else {
       console.error('Could not configure base URL, no server found in OpenAPI schema for ' + environmentName + ' environment.');
