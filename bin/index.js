@@ -5,7 +5,7 @@ const convert = require('../convert.js');
 const fs = require('fs');
 
 const convertWithArgv = (argv) => {
-  const {openApiSchemaFile, environment, baseUrl} = argv;
+  const {openApiSchemaFile, environment, baseUrl, outputFileName} = argv;
   const authOptions = {
     tokenGrantType: argv.tokenGrantType,
     clientId: argv.clientId,
@@ -18,10 +18,13 @@ const convertWithArgv = (argv) => {
   }
 
   convert(openApiSchemaFile, environment, baseUrl, authOptions).then((postmanCollection) => {
-    console.log('Writing Postman v2.1 collection to file...');
-    const postmanCollectionFile = './entry-postman.json';
-    fs.writeFileSync(postmanCollectionFile, JSON.stringify(postmanCollection, null, 2));
-    console.log('Wrote Postman v2.1 collection to file!');
+    if (outputFileName.length > 0) {
+      console.log('Writing Postman v2.1 collection to file...');
+      fs.writeFileSync(outputFileName, JSON.stringify(postmanCollection, null, 2));
+      console.log('Wrote Postman v2.1 collection to file!');
+    } else {
+      console.log(postmanCollection);
+    }
   });
 }
 
@@ -29,7 +32,7 @@ yargs
   .scriptName("openapi2postman")
   .usage('$0 <cmd> [args]')
   .command(
-    'convert <openApiSchemaFile> <clientId> <clientSecret> [environment] [baseUrl] [tokenGrantType] [userAuthCallbackUrl]',
+    'convert <openApiSchemaFile> <clientId> <clientSecret> [environment] [baseUrl] [tokenGrantType] [userAuthCallbackUrl] [outputFileName]',
     'Convert an OpenAPI schema file to a Postman collection and configure it for integrators',
     (yargs) => {
       yargs.positional('openApiSchemaFile', {
@@ -67,6 +70,12 @@ yargs
       yargs.option('userAuthCallbackUrl', {
         default: '',
         describe: 'the callback url to use when using the authorization_code grant type',
+        type: 'string'
+      });
+      yargs.option('outputFileName', {
+        alias: 'o',
+        default: '',
+        describe: 'allows you to store the output in a file',
         type: 'string'
       });
     },
