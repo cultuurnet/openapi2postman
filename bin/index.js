@@ -10,8 +10,13 @@ const postmanCollectionFile = './entry-postman.json'; // Hardcoded for now
 
 const environment = 'acc'; // Hardcoded for now
 const environmentSuffix = (environment === 'prod') ? '' : '-' + environment;
+const environmentNameMap = {
+  acc: 'Acceptance',
+  test: 'Testing',
+  prod: 'Production'
+};
+const environmentName = environmentNameMap[environment];
 
-const baseUrl = 'http://io' + environmentSuffix + '.uitdatabank.be'; // Dependent on API. Hardcoded for now.
 const tokenGrantType = 'client_credentials'; // Hardcoded for now. Sensible default would be `client_credentials`.
 const clientId = 'mock'; // Hardcoded for now.
 const clientSecret = 'mock'; // Hardcoded for now.
@@ -109,10 +114,6 @@ const callbackUrl = 'https://jwt' + environmentSuffix + '.uitdatabank.be/authori
       // Set authentication variables
       postmanCollection.variable = [
         {
-          key: 'baseUrl',
-          value: baseUrl
-        },
-        {
           key: 'oauth2ClientId',
           value: clientId
         },
@@ -139,6 +140,22 @@ const callbackUrl = 'https://jwt' + environmentSuffix + '.uitdatabank.be/authori
       }
 
       console.log('Added authentication configuration!');
+
+      // Configure the base URL for the given environment.
+      console.log('Configuring base url...');
+      postmanCollection.variable = postmanCollection.variable.filter((variable) => variable.key !== 'baseUrl');
+      const servers = deReferencedOpenApiSchema.servers ?? [];
+      const environmentServer = servers.find((server) => server.description === environmentName);
+      if (environmentServer) {
+        postmanCollection.variable.push({
+          key: 'baseUrl',
+          value: environmentServer.url
+        });
+        console.log('Configured base url!');
+      } else {
+        console.error('Could not configure base URL, no server found in OpenAPI schema for ' + environmentName + ' environment.');
+        console.warn('Make sure to configure the correct base URL yourself after importing the Postman collection!');
+      }
 
       // Write Postman collection to file.
       console.log('Writing Postman v2.1 collection to file...');
