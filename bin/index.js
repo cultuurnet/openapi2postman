@@ -22,7 +22,12 @@ const postmanCollectionFile = './entry-postman.json'; // Hardcoded for now
 
       // Convert the OpenAPI schema into a Postman collection.
       console.log('Converting OpenAPI schema to Postman v2.1 collection...');
-      const conversion = await convert({type: 'json', data: deReferencedOpenApiSchema}, {});
+      const conversionInput = {type: 'json', data: deReferencedOpenApiSchema};
+      const conversionOptions = {
+        folderStrategy: 'Tags',
+        collapseFolders: false
+      };
+      const conversion = await convert(conversionInput, conversionOptions);
       if (!conversion.result) {
         throw conversion.reason;
       }
