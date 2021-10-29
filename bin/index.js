@@ -7,6 +7,7 @@ const fs = require('fs');
 
 const openApiSchemaFile = './entry.json'; // Hardcoded for now
 const postmanCollectionFile = './entry-postman.json'; // Hardcoded for now
+const tokenGrantType = 'authorization_code'; // or 'client_credentials'. Hardcoded for now.
 
 (
   async () => {
@@ -33,6 +34,69 @@ const postmanCollectionFile = './entry-postman.json'; // Hardcoded for now
       }
       const postmanCollection = conversion.output[0].data;
       console.log('Converted OpenAPI schema to Postman v2.1 collection!');
+
+      // Configure authentication (only user access tokens for now).
+      console.log('Adding authentication configuration...');
+      postmanCollection.auth = {
+        type: "oauth2",
+        oauth2: [
+          {
+            key: "grant_type",
+            value: tokenGrantType,
+            type: "string"
+          },
+          {
+            key: "tokenName",
+            value: tokenGrantType === 'authorization_code' ? 'User access token' : 'Client access token',
+            type: "string"
+          },
+          {
+            key: "challengeAlgorithm",
+            value: "S256",
+            type: "string"
+          },
+          {
+            key: "accessTokenUrl",
+            value: "{{OAUTH2_ACCESS_TOKEN_URL}}",
+            type: "string"
+          },
+          {
+            key: "clientId",
+            value: "{{OAUTH2_CLIENT_ID}}",
+            type: "string"
+          },
+          {
+            key: "clientSecret",
+            value: "{{OAUTH2_CLIENT_SECRET}}",
+            type: "string"
+          },
+          {
+            key: "addTokenTo",
+            value: "header",
+            type: "string"
+          },
+          {
+            key: "client_authentication",
+            value: "header",
+            type: "string"
+          }
+        ]
+      };
+      if (tokenGrantType === 'authorization_code') {
+        postmanCollection.auth.oauth2 = postmanCollection.auth.oauth2.concat([
+          {
+            key: "authUrl",
+            value: "{{OAUTH2_AUTHORIZE_URL}}",
+            type: "string"
+          },
+          {
+            key: "redirect_uri",
+            value: "{{OAUTH2_CALLBACK_URL}}",
+            type: "string"
+          }
+        ]);
+      }
+      console.log('Added authentication configuration!');
 
       // Write Postman collection to file.
       console.log('Writing Postman v2.1 collection to file...');
