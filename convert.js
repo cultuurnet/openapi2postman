@@ -127,6 +127,18 @@ module.exports = async (openApiSchemaFile, environment, authOptions) => {
       ]);
     }
 
+    // Configure every request to inherit auth from parent (the collection).
+    const configureItemToInheritAuthFromParent = (item) => {
+      if (item.request) {
+        item.request.auth = null;
+      }
+      if (item.item) {
+        item.item = item.item.map(configureItemToInheritAuthFromParent);
+      }
+      return item;
+    };
+    postmanCollection.item.map(configureItemToInheritAuthFromParent);
+
     console.log('Added authentication configuration!');
 
     // Configure the base URL for the given environment.
