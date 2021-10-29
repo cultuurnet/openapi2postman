@@ -20,12 +20,13 @@ const convertWithArgv = (argv) => {
   const verbose = outputFileName.length > 0;
 
   convert(openApiSchemaFile, environment, baseUrl, authOptions, verbose).then((postmanCollection) => {
+    const stringified = JSON.stringify(postmanCollection, null, verbose ? 2 : 0);
     if (outputFileName.length > 0) {
       console.log('Writing Postman v2.1 collection to file...');
-      fs.writeFileSync(outputFileName, JSON.stringify(postmanCollection, null, 2));
+      fs.writeFileSync(outputFileName, stringified);
       console.log('Wrote Postman v2.1 collection to file!');
     } else {
-      console.log(postmanCollection);
+      console.log(stringified);
     }
   });
 }
