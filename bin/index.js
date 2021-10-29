@@ -10,19 +10,21 @@ const openApiSchemaFile = './entry.json'; // Hardcoded for now
   async () => {
     try {
       // Dereference the OpenAPI schema to resolve $refs to schemas in other files.
+      console.log('Dereferencing OpenAPI schema...');
       const deReferencedOpenApiSchema = await $RefParser.dereference(openApiSchemaFile);
-      console.log(JSON.stringify(deReferencedOpenApiSchema, null, 2));
+      console.log('Dereferenced OpenAPI schema!');
 
       // Make the Converter.convert() function (to convert the OpenAPI schema to a Postman collection) work with
       // promises.
       const convert = util.promisify(Converter.convert);
 
       // Convert the OpenAPI schema into a Postman collection.
+      console.log('Converting OpenAPI schema to Postman v2.1 collection...');
       const conversion = await convert({type: 'json', data: deReferencedOpenApiSchema}, {});
       if (!conversion.result) {
         throw conversion.reason;
       }
-      console.log(conversion);
+      console.log('Converted OpenAPI schema to Postman v2.1 collection!');
     } catch(err) {
       console.error(err);
       process.exit(1);
