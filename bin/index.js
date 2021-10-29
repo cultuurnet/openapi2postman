@@ -7,7 +7,14 @@ const fs = require('fs');
 
 const openApiSchemaFile = './entry.json'; // Hardcoded for now
 const postmanCollectionFile = './entry-postman.json'; // Hardcoded for now
-const tokenGrantType = 'authorization_code'; // or 'client_credentials'. Hardcoded for now.
+
+const baseUrl = 'http://io-acc.uitdatabank.be'; // // Dependent on environment. Hardcoded for now.
+const tokenGrantType = 'authorization_code'; // Hardcoded for now. Sensible default would be `client_credentials`.
+const authorizeUrl = 'https://account-acc.uitid.be/authorize?audience=https://api.publiq.be&prompt=login'; // Dependent on environment. Hardcoded for now.
+const accessTokenUrl = 'https://account-acc.uitid.be/oauth/token'; // Dependent on environment. Hardcoded for now.
+const clientId = 'mock'; // Hardcoded for now.
+const clientSecret = 'mock'; // Hardcoded for now.
+const callbackUrl = 'https://jwt-acc.uitdatabank.be/authorize'; // Hardcoded for now.
 
 (
   async () => {
@@ -37,6 +44,7 @@ const tokenGrantType = 'authorization_code'; // or 'client_credentials'. Hardcod
 
       // Configure authentication (only user access tokens for now).
       console.log('Adding authentication configuration...');
+
       postmanCollection.auth = {
         type: "oauth2",
         oauth2: [
@@ -96,6 +104,39 @@ const tokenGrantType = 'authorization_code'; // or 'client_credentials'. Hardcod
           }
         ]);
       }
+
+      // Set authentication variables
+      postmanCollection.variable = [
+        {
+          key: 'baseUrl',
+          value: baseUrl
+        },
+        {
+          key: 'OAUTH2_CLIENT_ID',
+          value: clientId
+        },
+        {
+          key: 'OAUTH2_CLIENT_SECRET',
+          value: clientSecret
+        },
+        {
+          key: 'OAUTH2_ACCESS_TOKEN_URL',
+          value: accessTokenUrl
+        },
+      ];
+      if (tokenGrantType === 'authorization_code') {
+        postmanCollection.variable = postmanCollection.variable.concat([
+          {
+            key: 'OAUTH2_AUTHORIZE_URL',
+            value: authorizeUrl
+          },
+          {
+            key: 'OAUTH2_CALLBACK_URL',
+            value: callbackUrl
+          }
+        ]);
+      }
+
       console.log('Added authentication configuration!');
 
       // Write Postman collection to file.
