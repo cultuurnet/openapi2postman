@@ -3,8 +3,10 @@
 const $RefParser = require("@apidevtools/json-schema-ref-parser");
 const Converter = require('openapi-to-postmanv2');
 const util = require('util');
+const fs = require('fs');
 
 const openApiSchemaFile = './entry.json'; // Hardcoded for now
+const postmanCollectionFile = './entry-postman.json'; // Hardcoded for now
 
 (
   async () => {
@@ -26,6 +28,11 @@ const openApiSchemaFile = './entry.json'; // Hardcoded for now
       }
       const postmanCollection = conversion.output[0].data;
       console.log('Converted OpenAPI schema to Postman v2.1 collection!');
+
+      // Write Postman collection to file.
+      console.log('Writing Postman v2.1 collection to file...');
+      fs.writeFileSync(postmanCollectionFile, JSON.stringify(postmanCollection, null, 2));
+      console.log('Wrote Postman v2.1 collection to file!');
     } catch(err) {
       console.error(err);
       process.exit(1);
