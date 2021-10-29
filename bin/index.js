@@ -19,6 +19,9 @@ const openApiSchemaFile = './entry.json'; // Hardcoded for now
 
       // Convert the OpenAPI schema into a Postman collection.
       const conversion = await convert({type: 'json', data: deReferencedOpenApiSchema}, {});
+      if (!conversion.result) {
+        throw conversion.reason;
+      }
       console.log(conversion);
     } catch(err) {
       console.error(err);
