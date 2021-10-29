@@ -11,5 +11,7 @@
   "bin": {
     "openapi2postman": "./bin/index.js"
   },
-  "dependencies": {}
+  "dependencies": {
+    "@apidevtools/json-schema-ref-parser": "^9.0.9"
+  }
 }
