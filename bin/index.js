@@ -65,17 +65,17 @@ const callbackUrl = 'https://jwt-acc.uitdatabank.be/authorize'; // Hardcoded for
           },
           {
             key: "accessTokenUrl",
-            value: "{{OAUTH2_ACCESS_TOKEN_URL}}",
+            value: "{{oauth2AccessTokenUrl}}",
             type: "string"
           },
           {
             key: "clientId",
-            value: "{{OAUTH2_CLIENT_ID}}",
+            value: "{{oauth2ClientId}}",
             type: "string"
           },
           {
             key: "clientSecret",
-            value: "{{OAUTH2_CLIENT_SECRET}}",
+            value: "{{oauth2ClientSecret}}",
             type: "string"
           },
           {
@@ -94,12 +94,12 @@ const callbackUrl = 'https://jwt-acc.uitdatabank.be/authorize'; // Hardcoded for
         postmanCollection.auth.oauth2 = postmanCollection.auth.oauth2.concat([
           {
             key: "authUrl",
-            value: "{{OAUTH2_AUTHORIZE_URL}}",
+            value: "{{oauth2AuthUrl}}",
             type: "string"
           },
           {
             key: "redirect_uri",
-            value: "{{OAUTH2_CALLBACK_URL}}",
+            value: "{{oauth2RedirectUri}}",
             type: "string"
           }
         ]);
@@ -112,26 +112,26 @@ const callbackUrl = 'https://jwt-acc.uitdatabank.be/authorize'; // Hardcoded for
           value: baseUrl
         },
         {
-          key: 'OAUTH2_CLIENT_ID',
+          key: 'oauth2ClientId',
           value: clientId
         },
         {
-          key: 'OAUTH2_CLIENT_SECRET',
+          key: 'oauth2ClientSecret',
           value: clientSecret
         },
         {
-          key: 'OAUTH2_ACCESS_TOKEN_URL',
+          key: 'oauth2AccessTokenUrl',
           value: accessTokenUrl
         },
       ];
       if (tokenGrantType === 'authorization_code') {
         postmanCollection.variable = postmanCollection.variable.concat([
           {
-            key: 'OAUTH2_AUTHORIZE_URL',
+            key: 'oauth2AuthUrl',
             value: authorizeUrl
           },
           {
-            key: 'OAUTH2_CALLBACK_URL',
+            key: 'oauth2RedirectUri',
             value: callbackUrl
           }
         ]);
