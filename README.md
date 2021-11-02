@@ -45,7 +45,7 @@ openapi2postman convert <open-api-file> <client-id> <client-secret> [-o <output 
 
 Required arguments:
 
--  `open-api-file`: Path to a local OpenAPI file
+-  `open-api-file`: Path or URL to an OpenAPI file
 -  `client-id`: Client ID to use for authentication
 -  `client-secret`: Client secret to use for authentication
 
@@ -57,7 +57,7 @@ Optional arguments:
 - `-g`: Token grant type to use for authentication. Can be either `client_credentials` for client access tokens, or `authorization_code` for user access tokens. Defaults to `client_credentials`.
 - `--userAuthCallbackUrl`: When using the `authorization_code` token grant type a callback URL is required to redirect the user to after login. Postman won't show this redirect, but it is required by OAuth2. The same callback URL has to be configured on the client in Auth0!
 
-**Example with only required arguments**
+#### Example with only required arguments
 
 ```
 openapi2postman convert my-open-api-file.json MY_CLIENT_ID MY_CLIENT_SECRET
@@ -68,3 +68,29 @@ This will create a Postman collection based on the given OpenAPI file `my-open-a
 The authentication configuration will be set to use the `client_credentials` grant type ("client access tokens") and will use the given `MY_CLIENT_ID` as client id and `MY_CLIENT_SECRET` as client secret.
 
 The Postman collection will be written to the console output.
+
+#### Writing the output to a file
+
+Use the `-o` options to specify a file name to write the output to instead of the console output.
+
+```
+openapi2postman convert my-open-api-file.json MY_CLIENT_ID MY_CLIENT_SECRET -o postman.json
+```
+
+The Postman collection will now be saved to a `postman.json` file that you can import in Postman.
+
+#### Examples with real API URLs
+
+Instead of using a local OpenAPI file, you can also use a URL that points to an OpenAPI file.
+
+UiTdatabank Entry API:
+```
+openapi2postman convert 'https://stoplight.io/api/v1/projects/publiq/uitdatabank/nodes/reference/entry.json?deref=optimizedBundle' MY_CLIENT_ID MY_CLIENT_SECRET -o uitdatabank.entry.postman.json
+```
+
+UiTPAS API:
+```
+openapi2postman convert 'https://stoplight.io/api/v1/projects/publiq/uitpas/nodes/reference/UiTPAS.v2.json?deref=optimizedBundle' MY_CLIENT_ID MY_CLIENT_SECRET -o uitpas.postman.json
+```
+
+(The example URLs above point to the OpenAPI files for the "Stable" branches of the APIs' documentation.)
