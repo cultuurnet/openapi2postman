@@ -92,6 +92,13 @@ module.exports = async (openApiSchemaFile, environment, customBaseUrl, authOptio
         key: "client_authentication",
         value: "header",
         type: "string"
+      },
+      {
+        key: 'audience',
+        value: {
+          '5369e798-a445-4a6e-a95a-0eb563d67670': 'https://api.publiq.be'
+        },
+        type: 'any'
       }
     ]
   };
