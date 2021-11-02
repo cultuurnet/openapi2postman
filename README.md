@@ -20,8 +20,6 @@ The authorization server URLs are also hardcoded to those of publiq.
 
 For now, the package can only be installed by cloning this repository.
 
-After cloning it, make sure to install it as a global package.
-
 ```
 # Checkout the repository
 git clone git@github.com:cultuurnet/openapi2postman.git
