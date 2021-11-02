@@ -18,8 +18,16 @@ For now, the package can only be installed by cloning this repository.
 After cloning it, make sure to install it as a global package.
 
 ```
+# Checkout the repository
 git clone git@github.com:cultuurnet/openapi2postman.git
+
+# Switch to the checked out directory
 cd openapi2postman
+
+# Install dependencies
+yarn install
+
+# Install as a global npm module
 npm install -g .
 ```
 
