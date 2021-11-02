@@ -56,6 +56,7 @@ Optional arguments:
 - `-b`: Custom base URL to overwrite the one set automatically by the chosen environment (for example for dev environments) or in case there is no base URL defined for the chosen environment or in the OpenAPI file.
 - `-g`: Token grant type to use for authentication. Can be either `client_credentials` for client access tokens, or `authorization_code` for user access tokens. Defaults to `client_credentials`.
 - `--userAuthCallbackUrl`: When using the `authorization_code` token grant type a callback URL is required to redirect the user to after login. Postman won't show this redirect, but it is required by OAuth2. The same callback URL has to be configured on the client in Auth0!
+- `-p` or `--prettyPrint`: Includes newlines and indentation (2 spaces) in the output for readability.
 
 #### Example with only required arguments
 

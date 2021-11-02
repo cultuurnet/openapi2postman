@@ -5,7 +5,7 @@ const convert = require('../convert.js');
 const fs = require('fs');
 
 const convertWithArgv = (argv) => {
-  const {openApiSchemaFile, environment, baseUrl, outputFileName} = argv;
+  const {openApiSchemaFile, environment, baseUrl, outputFileName, prettyPrint} = argv;
   const authOptions = {
     tokenGrantType: argv.tokenGrantType,
     clientId: argv.clientId,
@@ -21,7 +21,7 @@ const convertWithArgv = (argv) => {
 
   convert(openApiSchemaFile, environment, baseUrl, authOptions, verbose)
     .then((postmanCollection) => {
-      const stringified = JSON.stringify(postmanCollection, null, verbose ? 2 : 0);
+      const stringified = JSON.stringify(postmanCollection, null, prettyPrint ? 2 : 0);
       if (outputFileName.length > 0) {
         console.log('Writing Postman v2.1 collection to file...');
         fs.writeFileSync(outputFileName, stringified);
@@ -42,7 +42,7 @@ yargs
   .scriptName("openapi2postman")
   .usage('$0 <cmd> [args]')
   .command(
-    'convert <openApiSchemaFile> <clientId> <clientSecret> [environment] [baseUrl] [tokenGrantType] [userAuthCallbackUrl] [outputFileName]',
+    'convert <openApiSchemaFile> <clientId> <clientSecret> [environment] [baseUrl] [tokenGrantType] [userAuthCallbackUrl] [outputFileName] [prettyPrint]',
     'Convert an OpenAPI schema file to a Postman collection and configure it for integrators',
     (yargs) => {
       yargs.positional('openApiSchemaFile', {
@@ -87,6 +87,12 @@ yargs
         default: '',
         describe: 'allows you to store the output in a file',
         type: 'string'
+      });
+      yargs.option('prettyPrint', {
+        alias: 'p',
+        default: false,
+        describe: 'makes the Postman collection use newlines and indentation (2 spaces)',
+        type: 'boolean'
       });
     },
     convertWithArgv
