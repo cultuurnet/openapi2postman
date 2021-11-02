@@ -11,6 +11,11 @@ The authorization server URLs are also hardcoded to those of publiq.
 
 ## Usage as CLI script
 
+### Requirements
+
+- node (14+ recommended) and npm ([https://nodejs.org/en/](https://nodejs.org/en/)) (you can use [nvm](https://github.com/nvm-sh/nvm) to switch between multiple versions if needed)
+- yarn ([https://yarnpkg.com/](https://yarnpkg.com/))
+
 ### Installation
 
 For now, the package can only be installed by cloning this repository.
