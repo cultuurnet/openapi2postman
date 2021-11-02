@@ -47,6 +47,18 @@ module.exports = async (openApiSchemaFile, environment, customBaseUrl, authOptio
   const postmanCollection = conversion.output[0].data;
   log('Converted OpenAPI schema to Postman v2.1 collection!');
 
+  // Remove the example responses from the Postman collection (recursively for grouped items)
+  const removeExampleResponsesFromItem = (item) => {
+    if (item.response) {
+      item.response = [];
+    }
+    if (item.item) {
+      item.item = item.item.map(removeExampleResponsesFromItem);
+    }
+    return item;
+  };
+  postmanCollection.item.map(removeExampleResponsesFromItem);
+
   // Configure authentication (only user access tokens for now).
   log('Adding authentication configuration...');
 
