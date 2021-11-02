@@ -94,3 +94,7 @@ openapi2postman convert 'https://stoplight.io/api/v1/projects/publiq/uitpas/node
 ```
 
 (The example URLs above point to the OpenAPI files for the "Stable" branches of the APIs' documentation.)
+
+## Importing in Postman
+
+After you have used `openapi2postman` to generate a JSON file with a Postman collection, you can import it by clicking `File > Import` (`command+O` or `ctrl+O`) and dragging and dropping your file into the modal that opened. 
