@@ -29,6 +29,9 @@ yarn install
 
 # Install as a global npm module
 npm install -g .
+
+# Verify that it works (should be executable from any directory)
+openapi2postman --help
 ```
 
 ### Usage
