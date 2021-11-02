@@ -18,6 +18,12 @@ module.exports = async (openApiSchemaFile, environment, customBaseUrl, authOptio
     }
   }
 
+  const warn = (message) => {
+    if (verbose) {
+      console.warn(message);
+    }
+  }
+
   // Dereference the OpenAPI schema to resolve $refs to schemas in other files.
   log('Dereferencing OpenAPI schema...');
   const deReferencedOpenApiSchema = await $RefParser.dereference(openApiSchemaFile);
@@ -154,7 +160,7 @@ module.exports = async (openApiSchemaFile, environment, customBaseUrl, authOptio
   if (customBaseUrl.length > 0) {
     // If a custom base url is given, use that.
     baseUrl = customBaseUrl;
-    console.log('Using custom base URL provided with -b/--baseUrl option (' + baseUrl + ')');
+    log('Using custom base URL provided with -b/--baseUrl option (' + baseUrl + ')');
   } else {
     const servers = deReferencedOpenApiSchema.servers ?? [];
     const environmentServer = servers.find((server) => server.description === environmentName);
@@ -162,11 +168,11 @@ module.exports = async (openApiSchemaFile, environment, customBaseUrl, authOptio
     if (environmentServer) {
       // If a server is found for the given environment in the OpenAPI file, use that server's URL.
       baseUrl = environmentServer.url;
-      console.log('Using base URL defined for ' + environmentName + ' server in the OpenAPI file.');
+      log('Using base URL defined for ' + environmentName + ' server in the OpenAPI file.');
     } else if (environment === 'acc' && testServer) {
       // Otherwise use the test server's URL (if found) and replace the `-test.` suffix with `-acc.`.
       baseUrl = testServer.url.replace('-test.', '-acc.');
-      console.warn(
+      warn(
         'Warning: No base URL defined for ' + environmentName + ' server in the OpenAPI file. ' +
         'Guessed the base URL based on the base URL for the ' + environmentNameMap.test + ' environment.'
       );
@@ -179,8 +185,8 @@ module.exports = async (openApiSchemaFile, environment, customBaseUrl, authOptio
   if (baseUrl.length > 0) {
     log('Configured base url!');
   } else {
-    console.error('Could not configure base URL, no server found in OpenAPI schema for ' + environmentName + ' environment.');
-    console.warn('Make sure to configure the correct base URL yourself after importing the Postman collection!');
+    warn('Could not configure base URL, no server found in OpenAPI schema for ' + environmentName + ' environment.');
+    warn('Make sure to configure the correct base URL yourself after importing the Postman collection!');
   }
 
   return postmanCollection;
