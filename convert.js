@@ -148,15 +148,22 @@ module.exports = async (openApiSchemaFile, environment, customBaseUrl, authOptio
 
   // Configure the base URL for the given environment.
   log('Configuring base url...');
+  // Remove the baseUrl set by the Postman converter
   postmanCollection.variable = postmanCollection.variable.filter((variable) => variable.key !== 'baseUrl');
   let baseUrl = '';
   if (customBaseUrl.length > 0) {
+    // If a custom base url is given, use that.
     baseUrl = customBaseUrl;
   } else {
     const servers = deReferencedOpenApiSchema.servers ?? [];
     const environmentServer = servers.find((server) => server.description === environmentName);
+    const testServer = servers.find((server) => server.description === environmentNameMap.test);
     if (environmentServer) {
+      // If a server is found for the given environment in the OpenAPI file, use that server's URL.
       baseUrl = environmentServer.url;
+    } else if (environment === 'acc' && testServer) {
+      // Otherwise use the test server's URL (if found) and replace the `-test.` suffix with `-acc.`.
+      baseUrl = testServer.url.replace('-test.', '-acc.');
     }
   }
   postmanCollection.variable.push({
