@@ -59,6 +59,24 @@ module.exports = async (openApiSchemaFile, environment, customBaseUrl, authOptio
   };
   postmanCollection.item.map(removeExampleResponsesFromItem);
 
+  // Add a "raw" property to every request URL property (recursively for grouped items)
+  const createRawUrlFromUrlParts = (url) => {
+    const host = url.host ? url.host.join() : '';
+    const path = url.path ? url.path.join('/') : '';
+    const queryParams = url.query ? url.query.map((q) => q.key + '=' + q.value).join('&') : '';
+    return host + '/' + path + (queryParams.length > 0 ? '?' + queryParams : '');
+  };
+  const addRawUrlPropertyToItem = (item) => {
+    if (item.request && item.request.url) {
+      item.request.url.raw = createRawUrlFromUrlParts(item.request.url);
+    }
+    if (item.item) {
+      item.item = item.item.map(addRawUrlPropertyToItem);
+    }
+    return item;
+  };
+  postmanCollection.item.map(addRawUrlPropertyToItem);
+
   // Configure authentication (only user access tokens for now).
   log('Adding authentication configuration...');
 
