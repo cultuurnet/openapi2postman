@@ -199,7 +199,7 @@ module.exports = async (openApiSchemaFile, environment, customBaseUrl, authOptio
     baseUrl = customBaseUrl;
     log('Using custom base URL provided with -b/--baseUrl option (' + baseUrl + ')');
   } else {
-    const servers = deReferencedOpenApiSchema.servers ?? [];
+    const servers = deReferencedOpenApiSchema.servers || [];
     const environmentServer = servers.find((server) => server.description === environmentName);
     const testServer = servers.find((server) => server.description === environmentNameMap.test);
     if (environmentServer) {
