@@ -2,7 +2,7 @@
   "name": "openapi2postman",
   "version": "0.1.0",
   "description": "CLI script to convert a publiq OpenAPI file to a Postman collection, including authentication configuration",
-  "main": "bin/index.js",
+  "main": "convert.js",
   "scripts": {
     "test": "echo \\\"Error: no test specified\\\" && exit 1"
   },
