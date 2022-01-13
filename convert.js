@@ -47,6 +47,9 @@ module.exports = async (openApiSchemaFile, environment, customBaseUrl, authOptio
   const postmanCollection = conversion.output[0].data;
   log('Converted OpenAPI schema to Postman v2.1 collection!');
 
+  // Remove empty collections on the root level, created due to tags in OpenAPI that have no visible operations.
+  postmanCollection.item = postmanCollection.item.filter((folder) => folder.item.length > 0);
+
   // Remove the example responses from the Postman collection (recursively for grouped items)
   const removeExampleResponsesFromItem = (item) => {
     if (item.response) {
