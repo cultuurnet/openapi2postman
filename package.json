@@ -1,6 +1,6 @@
 {
   "name": "@publiqbe/openapi2postman",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "CLI script to convert a publiq OpenAPI file to a Postman collection, including authentication configuration",
   "main": "convert.js",
   "scripts": {
