@@ -3,7 +3,7 @@ const Converter = require('openapi-to-postmanv2');
 const util = require('util');
 
 module.exports = async (openApiSchemaFile, environment, customBaseUrl, authOptions, verbose) => {
-  const { tokenGrantType, clientId, clientSecret, callbackUrl } = authOptions;
+  const { tokenGrantType, clientId, clientSecret, callbackUrl, authPerRequest = false } = authOptions;
   const environmentSuffix = (environment === 'prod') ? '' : '-' + environment;
   const environmentNameMap = {
     acc: 'Acceptance',
@@ -110,7 +110,7 @@ module.exports = async (openApiSchemaFile, environment, customBaseUrl, authOptio
     }
     return item;
   };
-  postmanCollection.item.map(removeExampleResponsesFromItem);
+  postmanCollection.item = postmanCollection.item.map(removeExampleResponsesFromItem);
 
   // Add a "raw" property to every request URL property (recursively for grouped items)
   const createRawUrlFromUrlParts = (url) => {
@@ -128,7 +128,7 @@ module.exports = async (openApiSchemaFile, environment, customBaseUrl, authOptio
     }
     return item;
   };
-  postmanCollection.item.map(addRawUrlPropertyToItem);
+  postmanCollection.item = postmanCollection.item.map(addRawUrlPropertyToItem);
 
   // Configure authentication (only user access tokens for now).
   log('Adding authentication configuration...');
@@ -228,17 +228,17 @@ module.exports = async (openApiSchemaFile, environment, customBaseUrl, authOptio
     ]);
   }
 
-  // Configure every request to inherit auth from parent (the collection).
-  const configureItemToInheritAuthFromParent = (item) => {
+  // Configure every request to inherit auth from parent (the collection) or use its own auth.
+  const configureItemAuth = (item) => {
     if (item.request) {
-      item.request.auth = null;
+      item.request.auth = authPerRequest ? postmanCollection.auth : null;
     }
     if (item.item) {
-      item.item = item.item.map(configureItemToInheritAuthFromParent);
+      item.item = item.item.map(configureItemAuth);
     }
     return item;
   };
-  postmanCollection.item.map(configureItemToInheritAuthFromParent);
+  postmanCollection.item = postmanCollection.item.map(configureItemAuth);
 
   log('Added authentication configuration!');
 
