@@ -29,6 +29,58 @@ module.exports = async (openApiSchemaFile, environment, customBaseUrl, authOptio
   const deReferencedOpenApiSchema = await $RefParser.dereference(openApiSchemaFile);
   log('Dereferenced OpenAPI schema!');
 
+  // Remove "allOf", "anyOf", "oneOf" and "not" properties from schemas so they don't break the request body in Postman
+  // later. Directly inside requestBody.content.{contentType}.schema they are fine, but one level deeper it causes
+  // problems inside the openapi2postman converter for some reason. For example in the event-calendar-put.json model of
+  // UDB.
+  const removeProblematicKeywords = (schema) => {
+    const newSchema = {...schema};
+
+    // Remove the problematic keywords if the schema has a "type" (e.g. "object")
+    if ('type' in newSchema) {
+      delete newSchema.allOf;
+      delete newSchema.anyOf;
+      delete newSchema.oneOf;
+      delete newSchema.not;
+      return newSchema;
+    }
+
+    // If the schema has no type, go over each entry in its anyOf, allOf, or oneOf and remove the problematic keywords
+    // in the nested schemas.
+    ['allOf', 'anyOf', 'oneOf'].forEach((keyword) => {
+      if (keyword in newSchema && Array.isArray(newSchema[keyword])) {
+        newSchema[keyword] = newSchema[keyword].map((nestedSchema) => {
+          return removeProblematicKeywords(nestedSchema);
+        })
+      }
+    });
+    return newSchema;
+  }
+
+  if (deReferencedOpenApiSchema.paths) {
+    Object.keys(deReferencedOpenApiSchema.paths).forEach((path) => {
+      const pathData = deReferencedOpenApiSchema.paths[path];
+      const methods = Object.keys(pathData);
+      methods.forEach((method) => {
+        const methodData = pathData[method];
+        if (!methodData.requestBody?.content) {
+          return;
+        }
+        const content = methodData.requestBody.content;
+        const contentTypes = Object.keys(content);
+        contentTypes.forEach((contentType) => {
+          if (!content[contentType].schema) {
+            return;
+          }
+          const schema = content[contentType].schema;
+          deReferencedOpenApiSchema.paths[path][method].requestBody.content[contentType].schema = removeProblematicKeywords(schema);
+        });
+      })
+    })
+  }
+
+  console.log(deReferencedOpenApiSchema.paths['/events/{eventId}/calendar'].put.requestBody.content['application/json'].schema);
+
   // Make the Converter.convert() function (to convert the OpenAPI schema to a Postman collection) work with
   // promises.
   const convert = util.promisify(Converter.convert);
