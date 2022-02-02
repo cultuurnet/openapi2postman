@@ -9,7 +9,8 @@ const convertWithArgv = (argv) => {
   const authOptions = {
     tokenGrantType: argv.tokenGrantType,
     clientId: argv.clientId,
-    clientSecret: argv.clientSecret
+    clientSecret: argv.clientSecret,
+    authPerRequest: argv.authPerRequest
   };
 
   if (authOptions.tokenGrantType === 'authorization_code') {
@@ -81,6 +82,11 @@ yargs
         default: '',
         describe: 'the callback url to use when using the authorization_code grant type',
         type: 'string'
+      });
+      yargs.option('authPerRequest', {
+        default: false,
+        describe: 'configures authorization settings per request instead of globally',
+        type: 'boolean'
       });
       yargs.option('outputFileName', {
         alias: 'o',
