@@ -79,8 +79,6 @@ module.exports = async (openApiSchemaFile, environment, customBaseUrl, authOptio
     })
   }
 
-  console.log(deReferencedOpenApiSchema.paths['/events/{eventId}/calendar'].put.requestBody.content['application/json'].schema);
-
   // Make the Converter.convert() function (to convert the OpenAPI schema to a Postman collection) work with
   // promises.
   const convert = util.promisify(Converter.convert);
