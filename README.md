@@ -28,17 +28,18 @@ openapi2postman --help
 ### Usage
 
 ```
-openapi2postman convert <open-api-file> <client-id> <client-secret> [-o <output file>] [-e <environment>] [-b <base URL>] [-g <token grant type>] [--userAuthCallbackUrl <callback url>]
+openapi2postman convert <open-api-file> [-a <auth type>] [-i <client-id>] [-s <client-secret>] [-o <output file>] [-e <environment>] [-b <base URL>] [-g <token grant type>] [--userAuthCallbackUrl <callback url>]
 ```
 
 Required arguments:
 
 -  `open-api-file`: Path or URL to an OpenAPI file
--  `client-id`: Client ID to use for authentication
--  `client-secret`: Client secret to use for authentication
 
 Optional arguments:
 
+- `-a` or `--authMethod`: Authentication method to configure. Can be one of `none`, `token` or `x-client-id`. Defaults to `none`. Note that the supported methods can vary from API to API.
+- `-i` or `--clientId`: Client id to use for authentication (if `--authMethod` is set to `token` or `x-client-id`)
+- `-s` or `--clientSecret`: Client secret to use for authentication (if `--authMethod` is set to `token`)
 - `-o` or `--outputFileName`: File to write the resulting Postman collection to
 - `-e` or `--environment`: Environment to use for authentication and base URL. Can be one of `acc`, `test`, or `prod`. Defaults to `test`.
 - `-b` or `--baseUrl`: Custom base URL to overwrite the one set automatically by the chosen environment (for example for dev environments) or in case there is no base URL defined for the chosen environment or in the OpenAPI file.
@@ -47,10 +48,10 @@ Optional arguments:
 - `--authPerRequest`: Configures the authorization settings per request instead of globally.
 - `-p` or `--prettyPrint`: Includes newlines and indentation (2 spaces) in the output for readability.
 
-#### Example with only required arguments
+#### Basic example
 
 ```
-openapi2postman convert my-open-api-file.json MY_CLIENT_ID MY_CLIENT_SECRET
+openapi2postman convert my-open-api-file.json -a token -i MY_CLIENT_ID -s MY_CLIENT_SECRET
 ```
 
 This will create a Postman collection based on the given OpenAPI file `my-open-api-file.json`.
@@ -75,12 +76,12 @@ Instead of using a local OpenAPI file, you can also use a URL that points to an 
 
 UiTdatabank Entry API:
 ```
-openapi2postman convert 'https://stoplight.io/api/v1/projects/publiq/uitdatabank/nodes/reference/entry.json?deref=optimizedBundle' MY_CLIENT_ID MY_CLIENT_SECRET -o uitdatabank.entry.postman.json
+openapi2postman convert 'https://stoplight.io/api/v1/projects/publiq/uitdatabank/nodes/reference/entry.json?deref=optimizedBundle' -a token -i MY_CLIENT_ID -s MY_CLIENT_SECRET -o uitdatabank.entry.postman.json
 ```
 
 UiTPAS API:
 ```
-openapi2postman convert 'https://stoplight.io/api/v1/projects/publiq/uitpas/nodes/reference/UiTPAS.v2.json?deref=optimizedBundle' MY_CLIENT_ID MY_CLIENT_SECRET -o uitpas.postman.json
+openapi2postman convert 'https://stoplight.io/api/v1/projects/publiq/uitpas/nodes/reference/UiTPAS.v2.json?deref=optimizedBundle' -a token -i MY_CLIENT_ID -s MY_CLIENT_SECRET -o uitpas.postman.json
 ```
 
 (The example URLs above point to the OpenAPI files for the "Stable" branches of the APIs' documentation.)
