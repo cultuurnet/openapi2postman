@@ -38,7 +38,8 @@ module.exports = async (openApiSchemaFile, environment, customBaseUrl, authOptio
   const conversionInput = {type: 'json', data: deReferencedOpenApiSchema};
   const conversionOptions = {
     folderStrategy: 'Tags',
-    collapseFolders: false
+    collapseFolders: false,
+    optimizeConversion: false
   };
   const conversion = await convert(conversionInput, conversionOptions);
   if (!conversion.result) {
