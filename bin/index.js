@@ -6,12 +6,20 @@ const fs = require('fs');
 
 const convertWithArgv = (argv) => {
   const {openApiSchemaFile, environment, baseUrl, outputFileName, prettyPrint} = argv;
-  const authOptions = {
-    tokenGrantType: argv.tokenGrantType,
-    clientId: argv.clientId,
-    clientSecret: argv.clientSecret,
-    authPerRequest: argv.authPerRequest
-  };
+  const authOptions = {authMethod: argv.authMethod};
+
+  switch (authOptions.authMethod) {
+    case 'x-client-id':
+      authOptions.clientId = argv.clientId;
+      break;
+
+    case 'token':
+      authOptions.tokenGrantType = argv.tokenGrantType;
+      authOptions.clientId = argv.clientId;
+      authOptions.clientSecret = argv.clientSecret;
+      authOptions.authPerRequest = argv.authPerRequest;
+      break;
+  }
 
   if (authOptions.tokenGrantType === 'authorization_code') {
     const {userAuthCallbackUrl} = argv;
@@ -43,20 +51,31 @@ yargs
   .scriptName("openapi2postman")
   .usage('$0 <cmd> [args]')
   .command(
-    'convert <openApiSchemaFile> <clientId> <clientSecret> [environment] [baseUrl] [tokenGrantType] [userAuthCallbackUrl] [outputFileName] [prettyPrint]',
+    'convert <openApiSchemaFile> [authMethod] [clientId] [clientSecret] [environment] [baseUrl] [tokenGrantType] [userAuthCallbackUrl] [outputFileName] [prettyPrint]',
     'Convert an OpenAPI schema file to a Postman collection and configure it for integrators',
     (yargs) => {
       yargs.positional('openApiSchemaFile', {
         type: 'string',
         describe: 'the OpenAPI file to convert'
       });
-      yargs.positional('clientId', {
-        type: 'string',
-        describe: 'the client\'s id to use for authentication'
+      yargs.option('authMethod', {
+        alias: 'a',
+        default: 'none',
+        choices: ['none', 'token', 'x-client-id'],
+        describe: 'the authentication method to configure (mostly depends on the chosen API)',
+        type: 'string'
       });
-      yargs.positional('clientSecret', {
-        type: 'string',
-        describe: 'the client\'s secret to use for authentication'
+      yargs.option('clientId', {
+        alias: 'i',
+        default: '',
+        describe: 'the client\'s id to use for authentication',
+        type: 'string'
+      });
+      yargs.option('clientSecret', {
+        alias: 's',
+        default: '',
+        describe: 'the client\'s secret to use for authentication',
+        type: 'string'
       });
       yargs.option('environment', {
         alias: 'e',
